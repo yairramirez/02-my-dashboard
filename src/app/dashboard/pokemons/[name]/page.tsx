@@ -4,31 +4,28 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 interface Props {
-  params: { id: string };
+  params: { name: string };
 }
 
 // En buildtime
 export async function generateStacticParams() {
-  const static151Pokemons = Array.from({ length: 151 }).map( (v, i) => `${i + 1}`);
+  const data: PokemonsResponse = await fetch(`https://pokeapi.co/api/v2pokemon?limit=151`)
+    .then( res => res.json() );
 
-  return static151Pokemons.map( id => ({
-    id: id
+  const static151Pokemons = data.results.map( pokemon => ({
+    name: pokemon.name
   }));
 
-  // return [
-  //   { id: '1' },
-  //   { id: '2' },
-  //   { id: '3' },
-  //   { id: '4' },
-  //   { id: '5' },
-  //   { id: '6' },
-  // ]
+  return static151Pokemons.map( ({ name }) => ({
+    name: name
+  }));
+
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   try {
-    const { id, name } = await getPokemon(params.id);
+    const { id, name } = await getPokemon(params.name);
   
     return {
       title: `#${ id } - ${ name }`,
@@ -37,14 +34,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch (error) {
     return {
       title: `Pokémon no encontrado`,
-      description: `No se ha encontrado el pokémon con el id ${ params.id }`
+      description: `No se ha encontrado el pokémon con el id ${ params.name }`
     }
   }
 }
 
-const getPokemon = async(id: string): Promise<Pokemon> => {
+const getPokemon = async(name: string): Promise<Pokemon> => {
   try {
-    const pokemon = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`, {
+    const pokemon = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`, {
       cache: 'force-cache',
     }).then((res) => res.json());
   
@@ -56,7 +53,7 @@ const getPokemon = async(id: string): Promise<Pokemon> => {
 
 export default async function PokemonPage({ params }: Props) {
 
-  const pokemon = await getPokemon(params.id);
+  const pokemon = await getPokemon(params.name);
   
 
   return (
