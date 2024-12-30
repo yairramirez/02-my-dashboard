@@ -23,7 +23,7 @@ const menuItems = [
     subtitle: 'Generación estática'
   },
   {
-    path: '/dashboard/favourites',
+    path: '/dashboard/favorites',
     icon: <IoHeart size={40} />,
     title: 'Favoritos',
     subtitle: 'Global state'
